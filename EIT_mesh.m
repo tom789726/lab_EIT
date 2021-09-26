@@ -3,7 +3,7 @@ clc; clear all; close all;
 %% Import Domain (?)
 sz = 256;
 
-img = imread('circle.png');
+img = imread('phantom_circle.png');
 img_bw = double(img(:,:,1)); % Take 1 dimension
 img_bw = imresize(img_bw,[sz sz]); % resize 
 img1 = (img_bw > max(img_bw(:))/2); % binarize
