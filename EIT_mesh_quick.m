@@ -30,7 +30,7 @@ mesh = zeros(3,N); % node of meshes
 im_mesh = zeros(sz);
 im_mesh(mid,mid) = 1;
 
-r_max = round(225/2); % radius of outer circle
+r_max = round(sz/2); % radius of outer circle
 flag = 0; % for alternating angles in each ring
 count = 0; % for node record
 
@@ -58,6 +58,20 @@ for r = 0:(r_max/(ring_max)):r_max % create 5 rings of nodes
         next_y = round( r*sin(ang) );
         row = mid + next_y;
         col = mid + next_x;
+
+        % Boundary Protection
+        if (row >= sz)
+            row = sz;
+        end
+        if (col >= sz)
+            col = sz;
+        end
+        if (row <= 0)
+            row = 1;
+        end
+        if (col<=0)
+            col = 1;
+        end
         
         % Record node coordinates
         count = count+1;
@@ -86,7 +100,7 @@ for r = 0:(ring_max-1)
     for i = 1:L
         count = count+1;
         if (i == L) % reach the end, connect head to tail
-            disp("TAIL");
+%             disp("TAIL");
 %             p = r*L+i;
             p = count;
             plot([node(1,p-L+1),node(1,p)],[node(2,p-L+1),node(2,p)],'-k'); hold on
@@ -103,7 +117,7 @@ for r = 0:(ring_max-1)
                 mesh(3,count) = p-L;
             end
         else            
-            disp("BODY");
+%             disp("BODY");
 %             p = r*L+i;
             p = count;
             % connect same ring
@@ -181,8 +195,67 @@ comp3 = double(phantom).*cat(3,zeros(size(img_comp3)),img_comp3,img_comp3);
 
 % Area Estimation
 im_mesh = zeros(size(im_mesh));
+
+% Draw lines
 for i = 1:16 
-    
+    x = [node(1,uint8(mesh(1,i))),node(1,uint8(mesh(2,i)))];  % x coordinates (running along matrix columns)
+    y = [node(2,uint8(mesh(1,i))),node(2,uint8(mesh(2,i)))];   % y coordinates (running along matrix rows)
+    nPoints = max(abs(diff(x)), abs(diff(y)))+1;  % Number of points in line
+    rIndex = round(linspace(y(1), y(2), nPoints));  % Row indices
+    cIndex = round(linspace(x(1), x(2), nPoints));  % Column indices
+    index = sub2ind(size(im_mesh), rIndex, cIndex);     % Linear indices
+    im_mesh(index) = 255;  % Set the line pixels to the max value of 255 for uint8 types
+%   https://stackoverflow.com/questions/1940833/how-do-i-create-an-image-matrix-with-a-line-drawn-in-it-in-matlab
+    node3 = mesh(3,i); 
+    if (node3 ==0)
+        node3_x = mid;
+        node3_y = mid;
+    else
+        node3_x = node(1,mesh(3,i));
+        node3_y = node(2,mesh(3,i));
+    end
+    x = [node(1,uint8(mesh(1,i))),node3_x];   % x coordinates (running along matrix columns)
+    y = [node(2,uint8(mesh(1,i))),node3_y];   % y coordinates (running along matrix rows)
+    nPoints = max(abs(diff(x)), abs(diff(y)))+1;  % Number of points in line
+    rIndex = round(linspace(y(1), y(2), nPoints));  % Row indices
+    cIndex = round(linspace(x(1), x(2), nPoints));  % Column indices
+    index = sub2ind(size(im_mesh), rIndex, cIndex);     % Linear indices
+    im_mesh(index) = 255;  % Set the line pixels to the max value of 255 for uint8 types
+    %
+    x = [node(1,uint8(mesh(2,i))),node3_x];  % x coordinates (running along matrix columns)
+    y = [node(2,uint8(mesh(2,i))),node3_y];   % y coordinates (running along matrix rows)
+    nPoints = max(abs(diff(x)), abs(diff(y)))+1;  % Number of points in line
+    rIndex = round(linspace(y(1), y(2), nPoints));  % Row indices
+    cIndex = round(linspace(x(1), x(2), nPoints));  % Column indices
+    index = sub2ind(size(im_mesh), rIndex, cIndex);     % Linear indices
+    im_mesh(index) = 255;  % Set the line pixels to the max value of 255 for uint8 types
 end
+
+% figure
+% subplot(1,2,1);
+% imshow(im_mesh);
+% subplot(1,2,2);
+% imshow(im_mesh+img2*255);
+
+% Assign greyscale value to 3 components
+im_map = 2*(img_comp2)+3*(img_comp3)+4*(img_comp4);
+% Colormapping
+colmap = [0 0 0;1 0 0;0 1 0;0 0 1];
+for i = 1:16
+   % Approach 1: Mid-pt.
+    node3 = mesh(3,i);
+    if (node3 ==0)
+        node3_x = mid;
+        node3_y = mid;
+    else
+        node3_x = node(1,node3);
+        node3_y = node(2,node3);
+    end
+    mid_x = round((node(1,mesh(1,i))+node(1,mesh(2,i))+node3_x)/3);
+    mid_y = round((node(2,mesh(1,i))+node(2,mesh(2,i))+node3_y)/3);
+    A(i)= im_mesh(mid_x,mid_y);
+    disp(im_mesh(mid_x,mid_y));
+end
+
 figure
-imshow(im_mesh);
+imshow(im_map,[]);

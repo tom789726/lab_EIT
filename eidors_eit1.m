@@ -1,4 +1,4 @@
-% run C:\Users\Tom\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
+run C:\Users\tom78\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
 
 % Reference: 
 % https://www.youtube.com/watch?v=M42fTlVV7zk&ab_channel=Mecatr%C3%B3nicaM%C3%A1sters
