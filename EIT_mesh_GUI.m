@@ -22,7 +22,7 @@ function varargout = EIT_mesh_GUI(varargin)
 
 % Edit the above text to modify the response to help EIT_mesh_GUI
 
-% Last Modified by GUIDE v2.5 20-Sep-2021 01:24:47
+% Last Modified by GUIDE v2.5 27-Sep-2021 14:26:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -162,8 +162,8 @@ function Button_Start_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-
-if ~isfield(handles,'str')
+% Get mesh type
+if ~isfield(handles,'str') 
     h=get(handles.uibuttongroup1,'SelectedObject');
     type = get(h,'String');
     handles.type = type;    
@@ -171,11 +171,16 @@ else
     type = handles.type;
 end
 
+% Get electrode number
+h=get(handles.uibuttongroup2,'SelectedObject');
+numL = get(h,'String');
+handles.numL = str2double(numL);
+
 tic % timer
 
 if (strcmp(type,'Joshua'))
     disp('Joshua');
-    [mesh,node] = mesh_josh(hObject,handles);
+    [mesh,node] = mesh_josh(hObject,handles); % Function for Joshua Tree Mesh
 else
     disp('Classic');
     [mesh,node] = mesh_class(hObject,handles);
@@ -305,9 +310,16 @@ img_bw = ones(sz);
 
 
 %% Data Format Definition
-L_max = get(handles.edit_Num1,'String'); % no. of electrodes
-L_max = str2double(L_max);
+% L_max = get(handles.edit_Num1,'String'); % no. of electrodes
+% L_max = str2double(L_max);
+L_max = 32; % no. of electrodes (32)
 N = L_max*(L_max-1)/2; % no. of elements
+
+space = 32/handles.numL; % For re-mapping, space = 1(32)/ 2(16)/ 4(8)
+if (space>1)
+    disp(['re-mapping, electrode num =',num2str(32/space)]);
+    disp(num2str(space));
+end
 
 
 mid = sz/2; % Center
@@ -319,6 +331,7 @@ imshow(img_bw,[]);
 
 %% Test: level 1
 sz_ring = 8; % L, no. of elements at that level
+sz_ring_mesh = sz_ring/space; % replace sz_ring for mesh matrix, node matrix unchanged
 
 R = get(handles.edit_Num3,'String');
 R = str2double(R);
@@ -332,6 +345,7 @@ mesh(3,1:sz_ring) = (1:sz_ring)+2;
 mesh(4,1:sz_ring) = 0;
 % fine tune element #8
 mesh(3,sz_ring) = 2;
+
 
 mesh = sort(mesh);
 
@@ -354,7 +368,7 @@ map_ring = [8,8,8,8,16,16,16,16,24,24,24,24,24,24,32,32,32,32,32,32,32,32];
 map_radius = zeros(size(map_ring));
 map_radius(1) = r;
 
-for j = 2:22
+for j = 2:22 % 22 = size(map_ring)
     
     sz_ring = map_ring(j);
     r2 = sqrt( sz_ring* (R^2/N) + r^2 );
@@ -448,3 +462,12 @@ guidata(hObject, handles);
 function [mesh,node] = mesh_class(hObject,handles)
 
 
+
+
+% --- Executes on button press in rb3.
+function rb3_Callback(hObject, eventdata, handles)
+% hObject    handle to rb3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb3
