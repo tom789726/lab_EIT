@@ -17,8 +17,16 @@ node = zeros(5,N_max); % Node matrix, (theta/ring/r) --> (x,y)
 ax = figure();
 
 
-function [] = ( )
+function [] = setNode( )
 
+
+end
+
+function [] = setMesh()
+
+end
+
+function [] = showMesh()
 
 end
 
