@@ -1,12 +1,11 @@
-close all;
-clc;
+% clear all;
+close all; clc;
 
 %% Launch
 username = "tom78"
 pathname = fullfile("C:\Users\",username,"\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m");
-% run(pathname)
-% run C:\Users\Tom\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
 
+run(pathname)
 
 % imdl = mk_common_model('b2C',8);
 % show_fem(imdl.fwd_model,[0,1,0]); axis off;
