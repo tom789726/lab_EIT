@@ -95,9 +95,9 @@ xlim([1,128]);
 
 %%
 imdl = mk_common_model('c2c',16);
-imdl.fwd_model.stimulation = mk_stim_patterns(16,1,[1,0],[0,1],{'meas_current'},1);
-imdl.fwd_model = rmfield( imdl.fwd_model, 'meas_select');
+img = calc_jacobian_bkgnd( imdl );
+vh_fake = fwd_solve(img);
 
-img = inv_solve(imdl,real(v_reference)/1e4,v_opt);
 figure
-show_fem(img);
+plot(vh_fake.meas); hold on
+plot(vh/max(vh));

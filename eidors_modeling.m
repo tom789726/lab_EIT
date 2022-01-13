@@ -2,7 +2,7 @@
 close all; clc;
 
 %% Launch
-username = "Tom"
+username = "tom78"
 pathname = fullfile("C:\Users\",username,"\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m");
 
 run(pathname)
@@ -39,4 +39,44 @@ for idx= 1:3
    subplot(1,3,idx); 
    show_slices(img); title(string(imdl.hyperparameter.value));
 end
+
+
+%% 1224: EIT Modeling & Dice Index
+imdl= mk_common_model('c2c2',16);
+% Create homogeneous background image
+img= calc_jacobian_bkgnd( imdl );
+vh= fwd_solve(img);
+% Get inhomogeneous data
+img.elem_data([232,240])= 1.1;
+img.elem_data([225,249])= 0.9;
+vi= fwd_solve(img);
+subplot(131); show_fem(img,[0,1,0]); axis square
+
+img0 = inv_solve(imdl,vh,vi);
+subplot(132); show_fem(img0,[0,1,0]); axis square
+title('GN');
+
+imdl=mk_common_gridmdl('backproj');
+img1 = inv_solve(imdl,vh,vi);
+subplot(133); show_fem(img1,[0,1,0]); axis off
+title('Back projection');
+
+
+% Convert into image matrix
+rimg = calc_slices(img);
+% rimg = calc_colours(rimg,img);
+
+rimg0 = calc_slices(img0);
+% rimg0 = calc_colours(rimg0,img0);
+d
+
+figure
+subplot(121); imshow(rimg,[]);
+subplot(122); imshow(rimg0,[]);
+
+
+% dice = (2*rimg&rimg0)/(rimg+rimg0);
+% figure
+% imshow(dice,[]);
+
 
