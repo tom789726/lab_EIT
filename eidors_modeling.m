@@ -68,7 +68,6 @@ rimg = calc_slices(img);
 
 rimg0 = calc_slices(img0);
 % rimg0 = calc_colours(rimg0,img0);
-d
 
 figure
 subplot(121); imshow(rimg,[]);
