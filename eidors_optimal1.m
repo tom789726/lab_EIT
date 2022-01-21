@@ -3,14 +3,15 @@ clc;close all;
 
 % Part 1: create simple fwd_model structure
 
-n_elecs = 8;
+n_elecs = 16;
 % stim =  mk_stim_patterns(n_elecs,1,[0,1],[0,1],{'no_meas_current'},1);
 
 
 imdl= mk_common_model('c2c2',n_elecs);
 imdl.fwd_model.stimulation = mk_stim_patterns(n_elecs,1,'{ad}','{ad}',{},1);
-%% Create homogeneous background image
+disp(num_elems(imdl));
 
+%% Create homogeneous background image
 % img= calc_jacobian_bkgnd( imdl );
 img = mk_image(imdl,1);
 vh= fwd_solve(img);
@@ -34,7 +35,8 @@ title('GN');
 % title('Back projection');
 
 figure
-plot([vh.meas,100*(vh.meas-vi.meas)]); legend('Homogeneous','vh-vi');
+plot([vh.meas,100*(vh.meas-vi.meas)]); 
+legend('Homogeneous','vh-vi'); xlim([0,208]);
 
 figure
-show_current(img);
+show_current(img); 
