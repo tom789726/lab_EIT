@@ -5,26 +5,23 @@ clc;close all;
 
 n_elecs = 8;
 % stim =  mk_stim_patterns(n_elecs,1,[0,1],[0,1],{'no_meas_current'},1);
-
+stim=0;
 
 imdl= mk_common_model('c2c2',n_elecs);
-imdl.fwd_model.stimulation = mk_stim_patterns(n_elecs,1,'{ad}','{ad}',{},1);
-%% Create homogeneous background image
+imdl.stimulation = stim;
+% Create homogeneous background image
 
 % img= calc_jacobian_bkgnd( imdl );
 img = mk_image(imdl,1);
 vh= fwd_solve(img);
 
-%% Get inhomogeneous data
+% Get inhomogeneous data
 img.elem_data([232,240])= 1.1;
 img.elem_data([225,249])= 0.9;
 vi= fwd_solve(img);
-
-img0 = inv_solve(imdl,vh,vi);
-
-%% Display
 subplot(121); show_fem(img,[0,1,0]); axis square
 
+img0 = inv_solve(imdl,vh,vi);
 subplot(122); show_fem(img0,[0,1,0]); axis square
 title('GN');
 
@@ -34,7 +31,4 @@ title('GN');
 % title('Back projection');
 
 figure
-plot([vh.meas,100*(vh.meas-vi.meas)]); legend('Homogeneous','vh-vi');
-
-figure
-show_current(img);
+plot([vh.meas,100*vi.meas]); legend('Homogeneous','inhom');
