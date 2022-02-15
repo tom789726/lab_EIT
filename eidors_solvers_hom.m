@@ -24,27 +24,23 @@ skin = 1;
 muscle = 5;
 bone = 10;
 
-% Skin
+r_skin = 0.9;
+r_muscle = 0.7;
+r_bone = 0.15;
+% e.g. ratio of skin:whole region
+% = area of skin / area of whole region
+% = pi*r1^2 / pi*r2^2
+% or simply r1^2/r2^2
+% Take 0.9(skin) as reference / outer circle
+ratio_m = (r_muscle^2-r_bone^2)/r_skin^2;
+ratio_b = (r_bone^2)/r_skin^2;
+ratio_sk = (r_skin^2-r_muscle^2)/r_skin^2; % or 1-muscle-bone
+
+avg = ratio_m*muscle+ratio_b*bone+ratio_sk*skin;
+
 img_2 = img_1;
-select_fcn = '(x-0).^2+(y-0).^2<0.9^2';
-region1 = elem_select( img_2.fwd_model, select_fcn);
-img_2.elem_data = 1;
-img_2.elem_data = img_2.elem_data + region1*skin;
-
-% Muscle
-select_fcn2 = '(x-0).^2+(y-0).^2<0.7^2';
-region2 = elem_select( img_2.fwd_model, select_fcn2);
-img_2.elem_data = img_2.elem_data + region2*muscle;
-
-% Bone
-select_fcn3 = '(x--0.2).^2+(y-0.2).^2<0.15^2';
-region3 = elem_select( img_2.fwd_model, select_fcn3);
-img_2.elem_data = img_2.elem_data + region3*bone;
-
-img_0 = img_1;
-select_fcn = '(x--0.2).^2+(y-0.2).^2<0.15^2';
-region = elem_select( img_0.fwd_model, select_fcn);
-img_0.elem_data= 1+region*0.1;
+% img_2.elem_data = 1 + elem_select(img_2.fwd_model, select_fcn);
+img_2.elem_data = img_2.elem_data + avg;
 
 
 % TESTING END
@@ -116,10 +112,10 @@ vh = fwd_solve(img_2);
 % img_v.node_data = vh.volt(:,7);
 % show_fem(img_v);
 
-img_v.calc_colours.cb_shrink_move = [0.3,0.8,-0.02];
+% img_v.calc_colours.cb_shrink_move = [0.3,0.8,-0.02];
 % common_colourbar([h1,h2],img_v);
 % common_colourbar(h1,img_v);
-print_convert forward_solvers02a.png
+% print_convert forward_solvers02a.png
 
 %% Display
 
