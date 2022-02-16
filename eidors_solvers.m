@@ -1,4 +1,4 @@
-run C:\Users\Tom\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
+run C:\Users\tom78\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
 close all;
 % Forward solvers $Id: forward_solvers01.m 3790 2013-04-04 15:41:27Z aadler $
 

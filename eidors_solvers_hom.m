@@ -1,4 +1,4 @@
-run C:\Users\Tom\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
+run C:\Users\tom78\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
 close all;
 % Forward solvers $Id: forward_solvers01.m 3790 2013-04-04 15:41:27Z aadler $
 
@@ -130,7 +130,7 @@ J = stim(1).stim_pattern;
 D = sum(v2-J)^2;
 
 figure
-subplot(311);
+subplot(311); title('Current injection');
 plot(J);
 xlabel('electrode'); ylabel('current(amp)');
 subplot(312);
@@ -139,6 +139,7 @@ xlabel('measurement'); ylabel('voltage(volt)');
 subplot(313);
 plot(v2); xlim([1,n_elecs]); 
 xlabel('measurement'); ylabel('voltage(volt)');
+
 
 % TESTING
 
