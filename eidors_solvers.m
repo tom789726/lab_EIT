@@ -1,4 +1,4 @@
-run C:\Users\tom78\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
+run C:\Users\Tom\Documents\MATLAB\eidors-v3.10-ng\eidors\startup.m
 close all;
 % Forward solvers $Id: forward_solvers01.m 3790 2013-04-04 15:41:27Z aadler $
 
@@ -46,6 +46,24 @@ select_fcn = '(x--0.2).^2+(y-0.2).^2<0.15^2';
 region = elem_select( img_0.fwd_model, select_fcn);
 img_0.elem_data= 1+region*0.1;
 
+% -----Averaging area---
+% r_skin = 0.9;
+% r_muscle = 0.7;
+% r_bone = 0.15;
+% % e.g. ratio of skin:whole region
+% % = area of skin / area of whole region
+% % = pi*r1^2 / pi*r2^2
+% % or simply r1^2/r2^2
+% % Take 0.9(skin) as reference / outer circle
+% ratio_m = (r_muscle^2-r_bone^2)/r_skin^2;
+% ratio_b = (r_bone^2)/r_skin^2;
+% ratio_sk = (r_skin^2-r_muscle^2)/r_skin^2; % or 1-muscle-bone
+% 
+% avg = ratio_m*muscle+ratio_b*bone+ratio_sk*skin;
+% 
+% img_2 = img_1;
+% img_2.elem_data = img_2.elem_data + avg;
+% -------------------------
 
 % TESTING END
 
@@ -94,6 +112,7 @@ end
 %    stim(i).stimulation = 'Amp';
 % end
 
+
 % TESTING END
 
 
@@ -101,6 +120,8 @@ end
 img_2.fwd_model.stimulation = stim;
 img_2.fwd_solve.get_all_meas = 1;
 vh = fwd_solve(img_2);
+
+
 
 % Show first stim pattern
 % figure
