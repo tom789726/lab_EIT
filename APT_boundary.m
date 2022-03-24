@@ -3,9 +3,9 @@
 % compare and superposition the boundary data (mixed, lungs, heart)
 clc
 close all
-clear all
-cd('C:/Users/user/Documents/MATLAB/EIDORSm/eidors-v3.8/eidors');
-startup
+% clear all
+% cd('C:/Users/user/Documents/MATLAB/EIDORSm/eidors-v3.8/eidors');
+% startup
 n_elecs = 16;
 stim =  mk_stim_patterns(n_elecs,1,[0,1],[0,1],{'no_meas_current'},1);
 
