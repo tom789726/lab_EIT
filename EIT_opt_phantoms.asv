@@ -83,22 +83,19 @@ xlabel('electrode'); ylabel('voltage');
 %% Optimal current pattern (Initialise)
 it_max = 10;
 it = 0;
+% amp = 5;
+% img_test = img_cen;
 flag = 1;
-
+dist = 0;
+dist_prev = 0;
 
 precision = (amp*2)/2^8;
 
-% amp = 5;
-% img_test = img_cen;
+track = [];
+
 % See only particular pattern
 % id = 2;
 % idx = (1:n_elecs)+n_elecs*id;
-
-
-
-track = [];
-
-
 
 %% Optimal current pattern (General)
 close all
@@ -153,7 +150,12 @@ while( it<it_max && flag )
     subplot(313); plot(vh.meas(idx)-vi.meas(idx));  title( strcat('vh-vi, iteration',num2str(it)) );
     xlabel('electrode'); ylabel('voltage');
 
-    % Stopping Condition (general)
+    % Stopping Condition (See 1 pattern only)
+    it = it+1;
+    v_dif = vh.meas(idx)-vi.meas(idx);
+    dist = 
+    
+    % Stopping Condition
     it = it+1;
     v_dif = vh.meas-vi.meas; 
     if ( sum( v_dif(idx).^2 < precision ) >= n_elecs )
@@ -166,7 +168,7 @@ end
 
 figure
 plot(track);
-xlabel('iterations'); ylabel('v_diff');
+xlabel('iterations'); ylabel('loss');
 
 %% Note: adj
 % ----------define adjacent stimulation pattern by myself-------------
@@ -182,4 +184,55 @@ xlabel('iterations'); ylabel('v_diff');
 %     end
 %     s_new(:,i) = s;
 %     stim(i).stim_pattern = s;
+% end
+
+%% Iteration 2~n
+% v_prev = vh.meas;
+
+amp = 5;
+diff = v_prev-vi.meas;
+stim_new = reshape(diff,[n_elecs,n_elecs]);
+
+v_prev = vi.meas;
+
+% figure
+for i = 1:n_elecs
+    mx = max( abs(stim_new(:,i)) );
+    stim_new(:,i) = stim_new(:,i)/mx * amp;
+%     pause(1);
+%     plot(stim_new(:,i));
+%     disp(sum(stim_new(:,i)));
+end
+
+%% Feed new current pattern
+stim = mk_stim_patterns(n_elecs,1,'{ad}','{mono}',{'meas_current','balance_meas'},5);
+for i = 1:n_elecs
+   stim(i).stim_pattern = stim_new(:,i); 
+end
+
+img_test.fwd_model.stimulation = stim;
+img_test.fwd_solve.get_all_meas = 1;
+vi = fwd_solve(img_test);
+
+
+pt = size(v_prev,1);
+
+figure
+subplot(311); plot(vi.meas);
+title('Voltage meas of object at boundary'); 
+xlabel('electrode'); ylabel('voltage');
+xlim([1,pt]); xticks(0:n_elecs:pt);
+
+subplot(312); plot(v_prev); title('Volt of prev it.');
+xlim([1,pt]); xticks(0:n_elecs:pt);
+
+subplot(313); plot(v_prev-vi.meas); 
+title('vh-vi'); xlim([1,pt]); xticks(0:n_elecs:pt);
+
+% diff = v_prev-vi.meas;
+% diff = reshape(diff,[n_elecs,n_elecs]);
+% figure
+% for i = 1:n_elecs
+%     pause(1);
+%     plot(diff(:,i));
 % end
