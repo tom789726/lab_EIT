@@ -29,7 +29,9 @@ show_fem(img_cen);
 close all
 amp = 5;
 stim = mk_stim_patterns(n_elecs,1,'{ad}','{mono}',{'meas_current','balance_meas'},amp);
-img_test = img_cen;
+img_test = img_edg;
+
+
 
 % Solve U(sig1,j1)
 img_h.fwd_model.stimulation = stim;
@@ -64,7 +66,7 @@ for i = 1:8
 end
 
 % See only particular pattern
-id = 1;
+id = 1; 
 idx = (1:n_elecs)+n_elecs*id;
 %
 
@@ -78,10 +80,14 @@ xlabel('electrode'); ylabel('voltage');
 ax1 = subplot(313); plot(vh.meas(idx)-vi.meas(idx)); title( strcat('vh-vi, pattern',num2str(id)) );
 xlabel('electrode'); ylabel('voltage');
 
+% See current
+figure
+plot(stim(id).stim_pattern);
+xlabel('electrode'); ylabel('current (mA)');
 
 
 %% Optimal current pattern (Initialise)
-it_max = 10;
+it_max = 5;
 it = 0;
 flag = 1;
 
@@ -97,7 +103,8 @@ precision = (amp*2)/2^8;
 
 
 track = [];
-
+track_j = []; % Store current changes
+track_j = [track_j,stim(id).stim_pattern]; % **Observe single pattern only**
 
 
 %% Optimal current pattern (General)
@@ -153,6 +160,9 @@ while( it<it_max && flag )
     subplot(313); plot(vh.meas(idx)-vi.meas(idx));  title( strcat('vh-vi, iteration',num2str(it)) );
     xlabel('electrode'); ylabel('voltage');
 
+ %  See changes in current pattern
+    track_j = [track_j,stim_it(id).stim_pattern];
+    
     % Stopping Condition (general)
     it = it+1;
     v_dif = vh.meas-vi.meas; 
@@ -164,9 +174,54 @@ while( it<it_max && flag )
 %     disp(track);
 end
 
+
 figure
 plot(track);
-xlabel('iterations'); ylabel('v_diff');
+xlabel('iterations'); ylabel('v\_diff');
+
+%% Display current
+close all
+lg = [];
+n = size(track_j,2); % num of iterations
+
+% distinguishability
+
+% figure
+% for i = 2:n
+%     plot( track_j(:,i) - track_j(:,i-1) ); hold on
+%     lg = [lg; i-1];
+% end
+% legend(strcat('iteration',num2str(lg)));
+% xlabel('electrode');
+% ylabel('j\_diff');
+
+
+dist = [];
+for i = 2:n
+   dist(i) = sum( (track_j(:,i) - track_j(:,i-1)).^2  );
+end
+figure
+plot(dist);
+grid on
+xlabel('iterations');
+ylabel('distinguishability');
+
+% current 
+lg = [];
+figure
+for i = 1:n
+    plot( track_j(:,i) ); hold on
+    lg = [lg;i];
+end
+legend(strcat('iteration',num2str(lg)));
+grid on
+xlabel('electrode');
+ylabel('current');
+
+% current (final)
+figure
+plot(stim_it(id).stim_pattern);
+xlabel('electrode'); ylabel('current (mA)');
 
 %% Note: adj
 % ----------define adjacent stimulation pattern by myself-------------
